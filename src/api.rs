@@ -19,15 +19,14 @@ impl Guess {
     pub fn check_correctness(&mut self) -> Guessstate {
         let mut count = 0;
         for i in self.correctness.clone() {
-            match i {
-                Charstate::Correct => count += 1,
-                _ => {}
+            if let Charstate::Correct = i {
+                count += 1
             }
         }
         if count == self.correctness.len() {
-            return Guessstate::Correct;
+            Guessstate::Correct
         } else {
-            return Guessstate::False;
+            Guessstate::False
         }
     }
 }
@@ -46,8 +45,8 @@ pub fn check_word(word1: &Vec<u8>, word2: &Vec<u8>) -> Result<Vec<Charstate>, &'
             res.push(Charstate::Correct);
         } else {
             let mut counter = 0;
-            for j in 0..word2.len() {
-                if word1[i] == word2[j] {
+            for j in word2 {
+                if &word1[i] == j {
                     res.push(Charstate::Some);
                     break;
                 } else {
