@@ -16,12 +16,6 @@ pub struct Guess {
 }
 
 impl Guess {
-    pub fn new() -> Self {
-        Self {
-            raw: String::new(),
-            correctness: Vec::new(),
-        }
-    }
     pub fn check_correctness(&mut self) -> Guessstate {
         let mut count = 0;
         for i in self.correctness.clone() {
@@ -71,7 +65,7 @@ pub fn check_word(word1: &Vec<u8>, word2: &Vec<u8>) -> Result<Vec<Charstate>, &'
 
 pub fn get_user_input(msg: &str) -> String {
     let mut input = String::new();
-    println!("{msg}");
+    print!("{msg}");
     std::io::stdin().read_line(&mut input).unwrap();
     input.remove(input.len() - 1);
     input.remove(input.len() - 1);

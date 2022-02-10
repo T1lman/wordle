@@ -8,7 +8,6 @@ use rand::Rng;
 pub struct Game {
     correctword: Vec<u8>,
     guesses: Vec<Guess>,
-    words: crate::words::Words,
 }
 
 impl Game {
@@ -21,12 +20,18 @@ impl Game {
                 .as_bytes()
                 .to_vec(),
             guesses: Vec::new(),
-            words: words,
         };
     }
     fn start(&mut self) -> (GameState, usize) {
         for i in 1..self.correctword.len() + 1 {
-            let guess = api::get_user_input("Type your Guess!");
+            let mut guess = api::get_user_input("Type your Guess!\n");
+            if guess == "cheat!" {
+                println!(
+                    "You are cheating! The correct word is {}",
+                    String::from_utf8(self.correctword.clone()).unwrap()
+                );
+                guess = api::get_user_input("");
+            }
             let guess_correctness =
                 api::check_word(&guess.as_bytes().to_vec(), &self.correctword).unwrap();
             self.update_guesses(guess, guess_correctness);
