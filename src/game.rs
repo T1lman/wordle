@@ -32,8 +32,11 @@ impl Game {
                 );
                 guess = api::get_user_input("");
             }
-            let guess_correctness =
-                api::check_word(&guess.as_bytes().to_vec(), &self.correctword).unwrap();
+            let guess_correctness = api::handle_guess(
+                api::check_word(&guess.as_bytes().to_vec(), &self.correctword),
+                &self.correctword,
+            );
+
             self.update_guesses(guess, guess_correctness);
             println!(
                 "{}",
