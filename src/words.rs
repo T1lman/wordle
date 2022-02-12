@@ -21,4 +21,14 @@ impl Words {
         }
         self.words = returnvec;
     }
+
+    pub fn check_word(&self, word: String) -> bool {
+        for i in &self.words {
+            if i == &word {
+                return true;
+            }
+        }
+
+        false
+    }
 }

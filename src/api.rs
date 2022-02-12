@@ -1,3 +1,5 @@
+use crate::words;
+
 #[derive(Debug, Clone)]
 pub enum Charstate {
     None,
@@ -10,6 +12,7 @@ pub enum GameState {
     Lost,
 }
 
+#[derive(Debug, Clone)]
 pub struct Guess {
     pub raw: String,
     pub correctness: Vec<Charstate>,
@@ -35,9 +38,15 @@ pub enum Guessstate {
     False,
 }
 
+pub enum Guesstest {
+    Cheating,
+    Unavailable,
+    Usable,
+}
+
 pub fn check_word(word1: &Vec<u8>, word2: &Vec<u8>) -> Result<Vec<Charstate>, &'static str> {
     if word1.len() != word2.len() {
-        return Err("Provided a String with wrong lengths! Try another word!");
+        return Err("Provided a Word with wrong lengths! Try another word!");
     }
     let mut res: Vec<Charstate> = Vec::new();
     for i in 0..word1.len() {
@@ -84,17 +93,41 @@ pub fn translate_to_string(results: &Vec<Charstate>) -> String {
     res
 }
 
-pub fn handle_guess(
-    res: Result<Vec<Charstate>, &'static str>,
-    correctword: &Vec<u8>,
-) -> Vec<Charstate> {
-    let guess = match res {
-        Ok(guess) => guess,
-        Err(e) => {
-            println!("{e}");
-            let new_guess = get_user_input("Type your Guess!\n").as_bytes().to_vec();
-            handle_guess(check_word(&new_guess, correctword), correctword)
+pub fn check_cheating(guess: String) -> bool {
+    guess == *"cheat!"
+}
+
+pub fn test_handle_guess(wordlist: &words::Words, correctword: String) -> (String, Vec<Charstate>) {
+    let guess = handle_guess_test(wordlist, correctword.clone());
+    let guesscorrectness =
+        check_word(&guess.as_bytes().to_vec(), &correctword.as_bytes().to_vec()).unwrap();
+    println!("{}", translate_to_string(&guesscorrectness));
+    (guess, guesscorrectness)
+}
+
+pub fn handle_guess_test(wordlist: &words::Words, correctword: String) -> String {
+    let guess = get_user_input("Type your Guess!\n");
+    match test_guess(guess.clone(), wordlist) {
+        Guesstest::Cheating => {
+            println!("You are cheating! The correct word is {}!", correctword);
+            handle_guess_test(wordlist, correctword)
         }
-    };
-    guess
+        Guesstest::Unavailable => {
+            println!("Provided word is not available! Check your spelling or try another word!");
+            handle_guess_test(wordlist, correctword)
+        }
+        Guesstest::Usable => guess,
+    }
+}
+
+pub fn test_guess(guess: String, wordlist: &words::Words) -> Guesstest {
+    if check_cheating(guess.clone()) == true {
+        return Guesstest::Cheating;
+    } else {
+        if wordlist.check_word(guess) == true {
+            return Guesstest::Usable;
+        } else {
+            return Guesstest::Unavailable;
+        }
+    }
 }
