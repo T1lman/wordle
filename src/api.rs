@@ -86,7 +86,7 @@ pub fn translate_to_string(results: &Vec<Charstate>) -> String {
         match i {
             Charstate::Correct => res.push('🟩'),
             Charstate::Some => res.push('🟨'),
-            Charstate::None => res.push('🟫'),
+            Charstate::None => res.push('⬛'),
         }
     }
 
